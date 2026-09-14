@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YEĞİTEK Faz-4 Ağ Altyapısı Kurulum & Kontrol Rehberi ve Denetim Çeklisti</title>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2b6cb0;
+            --accent-color: #c53030;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --success-color: #38a169;
+            --warning-color: #dd6b20;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-tag {
+            background-color: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        p.subtitle {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        /* Overall Progress Bar (acts as compact sticky toolbar on mobile) */
+        .progress-section {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            max-width: 1200px;
+            margin: 20px auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            transition: padding 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            min-width: 250px;
+            background-color: #edf2f7;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-reset:hover {
+            background-color: #cbd5e1;
+        }
+
+        .btn-export {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* School Info Bar */
+        .school-info-container {
+            max-width: 1200px;
+            margin: 0 auto 15px auto;
+            background: white;
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .school-info-field {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .school-info-field label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .school-info-field input {
+            padding: 9px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            color: var(--text-color);
+        }
+
+        .school-info-field input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* School Switcher Bar */
+        .school-switcher-container {
+            max-width: 1200px;
+            margin: 15px auto 15px auto;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .school-switcher-field {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .school-switcher-field label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .school-switcher-field select {
+            padding: 9px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            color: var(--text-color);
+            background: white;
+        }
+
+        .school-switcher-field select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-add-school {
+            background-color: var(--success-color);
+            color: white;
+            white-space: nowrap;
+        }
+
+        .btn-add-school:hover {
+            background-color: #2f855a;
+        }
+
+        .btn-delete-school {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            white-space: nowrap;
+        }
+
+        .btn-delete-school:hover {
+            background-color: #fff5f5;
+        }
+
+        .school-switcher-divider {
+            width: 1px;
+            align-self: stretch;
+            background: var(--border-color);
+            margin: 0 2px;
+        }
+
+        .btn-export-data, .btn-import-data {
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            white-space: nowrap;
+        }
+
+        .btn-export-data:hover, .btn-import-data:hover {
+            background-color: #eff6ff;
+        }
+
+        /* Filter & Search Bar */
+        .controls-container {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 280px;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .nav-sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .nav-sidebar h3 {
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-toggle-icon {
+            font-size: 0.8rem;
+            transition: transform 0.25s ease;
+            color: var(--secondary-color);
+        }
+
+        .nav-sidebar.collapsed .nav-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 1200px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.25s ease;
+            opacity: 1;
+        }
+
+        .nav-sidebar.collapsed .nav-list {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .nav-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+            border-left: 4px solid #2563eb;
+        }
+
+        .nav-counter {
+            font-size: 0.75rem;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 10px;
+            color: #475569;
+        }
+
+        /* Checklist Sections */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .section-card.collapsed .section-header {
+            border-bottom: none;
+        }
+
+        .section-header h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header .sec-badge {
+            background: #3b82f6;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .section-progress-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .section-progress-badge.complete {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .section-toggle-icon {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            transition: transform 0.25s ease;
+        }
+
+        .section-card.collapsed .section-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .checklist-group {
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .section-card.collapsed .checklist-group {
+            display: none;
+        }
+
+        .section-card.collapsed .calc-box {
+            display: none;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #f1f5f9;
+            background-color: #fafafa;
+            transition: all 0.2s ease;
+        }
+
+        .check-item:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .check-item.checked {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .check-item.checked .item-text {
+            color: #166534;
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-text {
+            font-size: 0.92rem;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .item-meta {
+            margin-top: 4px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .ref-tag {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .critical-tag {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        .note-box {
+            margin-top: 6px;
+            background: #fffbe0;
+            border-left: 3px solid #f59e0b;
+            padding: 6px 10px;
+            font-size: 0.82rem;
+            color: #78350f;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .desc-box-wrapper {
+            margin-top: 8px;
+        }
+
+        .desc-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2b6cb0;
+            margin-bottom: 3px;
+        }
+
+        .desc-input {
+            width: 100%;
+            min-height: 36px;
+            resize: vertical;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            color: var(--text-color);
+            background: #f8fbff;
+            border: 1px dashed #93c5fd;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .desc-input:focus {
+            border-style: solid;
+            border-color: var(--secondary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .desc-input:not(:placeholder-shown) {
+            background: #eff6ff;
+            border-style: solid;
+            border-color: #bfdbfe;
+        }
+
+        /* Sac Kablo Kanalı Hesaplayıcı (Bölüm 7 özel widget) */
+        .calc-box {
+            margin: 0 20px 15px 20px;
+            background: #f8fbff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px 18px;
+        }
+
+        .calc-box-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calc-box-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 700px) {
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calc-field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #2b6cb0;
+            margin-bottom: 4px;
+        }
+
+        .calc-field input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.92rem;
+            outline: none;
+        }
+
+        .calc-field input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .calc-school-type {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .calc-school-type b {
+            color: var(--primary-color);
+        }
+
+        .calc-results {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .calc-result-card {
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .calc-result-card.rule {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success-color);
+            color: #14532d;
+        }
+
+        .calc-result-card.rule b {
+            color: #166534;
+        }
+
+        .calc-result-card.warning {
+            background: #fff7ed;
+            border-left: 4px solid var(--warning-color);
+            color: #7c2d12;
+        }
+
+        .calc-result-card.undefined {
+            background: #fef2f2;
+            border-left: 4px solid var(--accent-color);
+            color: #7f1d1d;
+        }
+
+        .calc-result-card.multi-note {
+            background: #eff6ff;
+            border-left: 4px solid var(--secondary-color);
+            color: #1e3a8a;
+            font-style: italic;
+        }
+
+        .calc-result-card.reminder {
+            background: #f8fafc;
+            border-left: 4px solid #94a3b8;
+            color: #334155;
+        }
+
+        .calc-empty-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s ease;
+            z-index: 980;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* ===== Mobile Optimizations ===== */
+        @media (max-width: 850px) {
+            header {
+                position: static;
+                padding: 0.9rem 1rem;
+                text-align: left;
+            }
+
+            .header-container {
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .badge-tag {
+                font-size: 0.65rem;
+                padding: 3px 9px;
+            }
+
+            h1 {
+                font-size: 1.05rem;
+                line-height: 1.35;
+            }
+
+            p.subtitle {
+                display: none;
+            }
+
+            .progress-section {
+                position: sticky;
+                top: 0;
+                z-index: 950;
+                border-radius: 0;
+                margin: 0 auto 14px auto;
+                padding: 10px 14px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            }
+
+            .progress-bar-container {
+                min-width: 140px;
+                height: 14px;
+            }
+
+            .progress-text {
+                font-size: 0.85rem;
+                min-width: auto;
+            }
+
+            .action-buttons {
+                gap: 6px;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+
+            .controls-container,
+            .school-info-container {
+                margin-left: 12px;
+                margin-right: 12px;
+                width: auto;
+            }
+
+            .main-container {
+                margin-left: 12px;
+                margin-right: 12px;
+                width: auto;
+            }
+
+            .nav-sidebar {
+                position: static;
+                top: auto;
+            }
+
+            .back-to-top {
+                bottom: 16px;
+                right: 16px;
+                width: 42px;
+                height: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <span class="badge-tag">T.C. MİLLÎ EĞİTİM BAKANLIĞI - ZONGULDAK YEĞİTEK</span>
+            <h1>FATİH Projesi Faz-4 Yerel Alan Ağı (LAN) Kurulum ve Denetim Çeklisti</h1>
+            <p class="subtitle">Bilişim Yöneticileri, İl Koordinatörleri ve Denetim Komisyonları İçin Adım Adım Kontrol Rehberi (2025 Şartnamesi)</p>
+        </div>
+    </header>
+
+    <div class="progress-section">
+        <div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Toplama Göre Genel Kurulum Uygunluk İlerlemesi:</div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">0 / 0 (%0)</div>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-reset" onclick="resetProgress()">Sıfırla</button>
+            <button class="btn btn-export" onclick="exportReport()">Denetim Raporunu İndir (Excel)</button>
+        </div>
+    </div>
+
+    <div class="school-switcher-container">
+        <div class="school-switcher-field">
+            <label for="schoolSelect">Aktif Okul (Kayıtlı Denetimler)</label>
+            <select id="schoolSelect" onchange="handleSchoolSwitch(this.value)"></select>
+        </div>
+        <button class="btn btn-add-school" onclick="addNewSchool()">+ Yeni Okul Ekle</button>
+        <button class="btn btn-delete-school" onclick="deleteCurrentSchool()" title="Aktif okulu ve tüm verilerini kalıcı olarak siler">🗑 Bu Okulu Sil</button>
+        <div class="school-switcher-divider"></div>
+        <button class="btn btn-export-data" onclick="exportAllData()" title="Tüm okullarınızın tüm verilerini tek bir dosyaya yedekler">📤 Tüm Verileri Yedekle</button>
+        <button class="btn btn-import-data" onclick="triggerImportFile()" title="Daha önce aldığınız bir yedek dosyasını geri yükler">📥 Yedekten Geri Yükle</button>
+        <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" onchange="importAllData(event)">
+    </div>
+
+    <div class="school-info-container">
+        <div class="school-info-field">
+            <label for="schoolNameInput">Denetimi Yapılan Okul</label>
+            <input type="text" id="schoolNameInput" placeholder="Örn: Kozlu Atatürk İlkokulu" oninput="saveSchoolInfo()">
+        </div>
+        <div class="school-info-field">
+            <label for="auditDateInput">Denetim Tarihi</label>
+            <input type="date" id="auditDateInput" oninput="saveSchoolInfo()">
+        </div>
+    </div>
+
+    <div class="controls-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="Madde, şartname kuralı veya anahtar kelime ara (örn: Topraklama, 3 Ohm, Cat6, Fan, Fluke, KAKR)..." oninput="filterItems()">
+    </div>
+
+    <div class="main-container">
+        <!-- Nav Sidebar -->
+        <nav class="nav-sidebar" id="navSidebar">
+            <h3 onclick="toggleNavSidebar()">
+                <span>KONTROL AŞAMALARI</span>
+                <span class="nav-toggle-icon" id="navToggleIcon">▼</span>
+            </h3>
+            <ul class="nav-list" id="navList">
+                <!-- Nav items generated via JS -->
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="content-area" id="contentArea">
+            <!-- Checklist cards generated via JS -->
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 T.C. Millî Eğitim Bakanlığı - Yenilik ve Eğitim Teknolojileri Genel Müdürlüğü (YEĞİTEK)</p>
+        <p>Faz-4 Yerel Alan Ağı Kurulum İş Şartnamesi Esas Alınarak Bilişim Yöneticileri İçin Hazırlanmıştır.</p>
+        <p>Kozlu/ZONGULDAK YEĞİTEK Bilişim Koordinatörü - Mehmet Ali KAYGUSUZ</p>
+    </footer>
+
+    <button class="back-to-top" id="backToTopBtn" onclick="scrollToTop()" aria-label="Yukarı çık" title="Başa dön">↑</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script>
+        const checklistData = [
+            {
+                id: "sec1",
+                title: "1. Genel Hükümler & Personel/Güvenlik Şartları",
+                badge: "Maddeler 4.1 - 4.19",
+                items: [
+                    { id: "c1_1", ref: "Madde 4.4 - 4.5", text: "Çalışacak tüm personelin TCK ilgili maddelerinden mahkumiyeti bulunmadığı doğrulanmış ve Proje/Yüklenici adı yazılı fotoğraflı kimlik kartları sürekli takılı mı?", critical: true },
+                    { id: "c1_2", ref: "Madde 4.6", text: "Tüm Yüklenici ve alt-yüklenici personeli sahaya çıkmadan önce detaylı teknik eğitim almış mı?", critical: false },
+                    { id: "c1_3", ref: "Madde 4.7", text: "İl Milli Eğitim Müdürlüğü ile yazılı bilgilendirme toplantısı yapılmış, çalışma takvimi, personel bilgileri ve keşif planı paylaşılmış mı?", critical: false },
+                    { id: "c1_4", ref: "Madde 4.12", text: "Kurulumlar okulda eğitimi aksatmayacak saatlerde planlanmış ve mesai dışı çalışmalar İl Koordinatörü/Okul İdaresi ile koordine edilmiş mi?", critical: false },
+                    { id: "c1_5", ref: "Madde 4.14", text: "7/24 ulaşılabilecek en az 1 Proje Sorumlusu İdareye bildirilmiş mi?", critical: false },
+                    { id: "c1_6", ref: "Madde 4.15", text: "Kurulumda kullanılan TÜM malzeme ve aktif/pasif bileşenler orijinal, sıfır ve kullanılmamış mı?", critical: true },
+                    { id: "c1_7", ref: "Madde 4.18", text: "İş güvenliği kurallarına uyuluyor mu? Okulda konaklama yapılmadığı ve günlük çalışma sonrası çalışma alanının temizlendiği kontrol edildi mi?", critical: true },
+                    { id: "c1_8", ref: "Madde 4.19", text: "Sözleşme/garanti süresince okulda oluşacak ilk 50 adet ek enerji/data ihtiyacı bedelsiz karşılanacağı taahhüt edildi mi?", critical: false }
+                ]
+            },
+            {
+                id: "sec2",
+                title: "2. Dokümantasyon & Proje Çizimleri",
+                badge: "Maddeler 5.1 - 5.4",
+                items: [
+                    { id: "c2_1", ref: "Madde 5.1", text: "Zorunlu formlar tam mı? (Keşif Formu, İşe Başlama/Bitirme Tutanakları, Kat Planı, Topraklama Formu, Hasarsızlık Raporu, UTP Test Raporu, Malzeme Teslim Tutanağı)", critical: true },
+                    { id: "c2_2", ref: "Madde 5.2.2 - 5.2.3", text: "Okul Kat Planları AutoCAD/Visio ile her kat A4 sayfasına basılacak şekilde çizilmiş; kapakta okul bilgileri, aktif/pasif özet sayıları yer alıyor mu?", critical: false },
+                    { id: "c2_3", ref: "Madde 5.2.4", text: "Kat planında Sistem Odası, Pano, Kat Geçişleri, Topraklama Hattı, Sac/PVC Kanallar, Veri/Enerji Prizleri ve metrajlar eksiksiz işlenmiş mi?", critical: false },
+                    { id: "c2_4", ref: "Madde 5.3.1", text: "Kanal kapakları açıkken kablo çekilmeden önceki örnek fotoğraf/videolar çekilmiş mi?", critical: false },
+                    { id: "c2_5", ref: "Madde 5.3.3", text: "Kat planı A4 renkli çıktı alınıp kabinet kapağının iç tarafına poşet dosya içerisinde yapıştırılmış mı?", critical: true },
+                    { id: "c2_6", ref: "Madde 5.3.4", text: "Topraklama çukuru kazısı, çubuk yerleşimi ve Gem tozu uygulaması fotoğraf ve video ile kayıt altına alınıp dijital olarak İdareye teslim edildi mi?", critical: true }
+                ]
+            },
+            {
+                id: "sec3",
+                title: "3. Uç Sayıları ve Alan Sınırlamaları",
+                badge: "Maddeler 6.1 - 6.7",
+                items: [
+                    { id: "c3_1", ref: "Madde 6.3 - 6.4", text: "ADSL/Router kablosu ve BT sınıfında AP'den Tahtaya çekilen ek kablo ücretsiz çekilmiş ve DATA UCU OLARAK SAYILMAMIŞ mı?", critical: true },
+                    { id: "c3_2", ref: "Madde 6.5", text: "Bir odaya çekilen toplam data ucu sayısı kesinlikle 5 (beş) adedi geçmiyor mu?", critical: true },
+                    { id: "c3_3", ref: "Madde 6.6", text: "Dersliklerde 1 Data Ucu + 1 Enerji Ucu çekilmiş mi? (İdari odalarda Personel Sayısı + 1 formülü uygulanmış mı?)", critical: false },
+                    { id: "c3_4", ref: "Madde 6.7", text: "Yasaklı/Uç Çekilmeyecek Alanlar Kontrolü: Koridor, Lobi, Akü/Pano/Elektrik Odası, Depo, Mutfak, Isınma Dairesi, Wc vb. yerlere uç ÇEKİLMEMİŞ mi?", critical: true, note: "Tanımsız alanlara uç çekilmesi yasaktır. İhtiyaç halinde Merkezi Kontrol Teşkilatı onayı şarttır." }
+                ]
+            },
+            {
+                id: "sec4",
+                title: "4. Sistem Odası ve İklimlendirme",
+                badge: "Maddeler 7.1 - 7.9",
+                items: [
+                    { id: "c4_1", ref: "Madde 7.2", text: "Sistem odası okulun dikey/yatay merkezinde, müstakil ve kat geçişlerine uygun bir oda olarak seçilmiş mi?", critical: false },
+                    { id: "c4_2", ref: "Madde 7.4", text: "Kablolama mesafesi 90 metreyi aşan durumlarda 2. Kabinet/Sistem odası planlanmış ve Ardışık (A, B, C) olarak isimlendirilmiş mi?", critical: true },
+                    { id: "c4_3", ref: "Madde 7.5", text: "Sistem odasındaki pencereler/ışık geçiren kısımlar güneş ışığını önleyecek şekilde IŞIK GEÇİRMEYEN FİLM ile kaplanmış mı?", critical: false },
+                    { id: "c4_4", ref: "Madde 7.6.4", text: "Sistem odasında klima yoksa, kapı veya pencereye en az 25x25 cm ebatlarında toza karşı klapeli/ayarlanabilir metal/PVC havalandırma menfezi takılmış mı?", critical: false },
+                    { id: "c4_5", ref: "Madde 7.8", text: "Sistem odasında kalorifer peteği varsa kullanımı kapatılmış mı? Su tesisatı var ise iptal edilmiş/farklı oda seçilmiş mi?", critical: true }
+                ]
+            },
+            {
+                id: "sec5",
+                title: "5. Kabinet Standartları & Yerleşim Düzeni",
+                badge: "Maddeler 8.1 - 8.36",
+                items: [
+                    { id: "c5_1", ref: "Madde 8.1 - 8.3", text: "Tüm kabinetler 19 inç, IEC 60529'a uygun, TSE (EN 61587-1) belgeli ve RoHS uyumlu mu?", critical: false },
+                    { id: "c5_2", ref: "Madde 8.5 - 8.6", text: "Ön kapak camı en az 4 mm temperli, kilitlenebilir; tüm kapaklar aynı anahtarla açılabilir yapıda mı?", critical: false },
+                    { id: "c5_3", ref: "Madde 8.8", text: "Kabinet gövdesi ve kapakları topraklama şönt kablosu ile kabinete ve topraklama barasına bağlanmış mı?", critical: true },
+                    { id: "c5_4", ref: "Madde 8.10 - 8.11", text: "Kabinet Boyut Uygunluğu: 42U, 26U, 16U, 9U (800x600 mm dikili/duvar) ve 4U (600x450 mm duvar tipi) standartlarına uygun mu?", critical: false },
+                    { id: "c5_5", ref: "Madde 8.13", text: "9U ve 4U Duvar tipi kabinetlerde arka profil içten vidalanmış VE alt kısımdan L sabitleme aparatı ile duvara ilave sabitlenmiş mi?", critical: true },
+                    { id: "c5_6", ref: "Madde 8.16 - 8.17", text: "Grup Prizler: 42U/26U'da 2x6'lı sigortalı (16A), 16U/9U/4U'da 1x6'lı sigortalı priz var ve Fatih Panosundaki 16A sigortadan beslenmiş mi?", critical: true },
+                    { id: "c5_7", ref: "Madde 8.19 - 8.20", text: "Dikili tip kabinetlerde ön tekerlekler frenli, taşıma kapasitesi en az 400kg mı? Deprem ayakları her iki yanda boydan tek parça monte edilmiş mi?", critical: true },
+                    { id: "c5_8", ref: "Madde 8.22 - 8.25", text: "Fan Sayıları: 42U (en az 6 AC fan / 480 CFM), 26U/16U (en az 4 AC fan / 320 CFM), 9U (en az 2 AC fan / 160 CFM) termostatlı bilyeli fanlar çalışır durumda mı?", critical: false },
+                    { id: "c5_9", ref: "Madde 8.30", text: "Kabinet kapağında Fatih Logosu, Fatih PYS internet adresi, Kabinet Adı (A, B, C) ve CBS Bina Kodu etiketleri yapıştırılmış mı?", critical: false },
+                    { id: "c5_10", ref: "Şartname U Tabloları", text: "U Yerleşim Planı Uygunluğu: Patch Paneller, Switchler, Router, Fan ve Grup prizler şartnamedeki tam U sırasına göre dizilmiş mi?", critical: true }
+                ]
+            },
+            {
+                id: "sec6",
+                title: "6. Patch Panel, Patch Kablo ve Etiketleme",
+                badge: "Maddeler 9.1 - 12.1",
+                items: [
+                    { id: "c6_1", ref: "Madde 9.1 - 9.2", text: "UTP ve Fiber Patch Paneller 1U, tamamı metal gövdeli ve alev almaz özellikte mi?", critical: false },
+                    { id: "c6_2", ref: "Madde 9.7", text: "Patch panellere uplink/downlink için 1 adet feedthrough keystone jack takılmış mı?", critical: false },
+                    { id: "c6_3", ref: "Madde 9.9 - 9.12", text: "Patch panel arkasında orijinal fabrikasyon kablo tutucu aparat var mı? Kablo dış kılıfı keystone jack girişine kadar soyulup seperatör bozulmadan çakılmış mı?", critical: true },
+                    { id: "c6_4", ref: "Madde 9.16.1", text: "Etiketleme Sırası: Soldan sağa, yukarıdan aşağıya; 1-3-5 sıradakiler ÇİFT sayı (A02, A04..), 2-4-6 sıradakiler TEK sayı (A01, A03..) ile etiketlenmiş mi?", critical: true },
+                    { id: "c6_5", ref: "Madde 10.5 (Renk Kodları)", text: "Patch Kablo Renk Standartları Doğru mu? SARI (AP - 20cm), KIRMIZI (ET - 20cm/1m), MAVİ (BT - 20cm/1m), BEYAZ (İdari - 20cm/3m), TURUNCU (Router/Uplink - 20cm)?", critical: true },
+                    { id: "c6_6", ref: "Madde 12.1.1", text: "Switch-Patch Panel Bağlantısı: Switch'in ÇİFT portları ÜSTÜNDEKİ panele, TEK portları ALTINDAKİ panele bağlanmış mı?", critical: true },
+                    { id: "c6_7", ref: "Madde 12.1.2", text: "Switch Port Dizilim Sırası: Önce Turuncu (Uplink/ADSL), sonra Sarı (AP), sonra Kırmızı (ET), sonra Beyaz (İdari), en son Mavi (BT) şeklinde dizilmiş mi?", critical: true }
+                ]
+            },
+            {
+                id: "sec7",
+                title: "7. Sac Kablo Kanalı Uygulaması",
+                badge: "Maddeler 24.1 - 25.27",
+                items: [
+                    { id: "c7_1", ref: "Madde 24.4 - 24.6", text: "Sac kanallar pregalvaniz (en az 100g/m²), min 0.8 mm kalınlıkta, yan yüksekliği 40 mm ve tabanı slot delikli mi?", critical: false },
+                    { id: "c7_2", ref: "Madde 25.1 - 25.2", text: "Tavan/Duvara montajda çelik dübel, L konsol veya tij kullanılmış mı? Sallantısız ve rijit monte edilmiş mi?", critical: true },
+                    { id: "c7_3", ref: "Madde 25.7", text: "Kanal kapağının açılabilmesi için tavan veya kiriş ile sac kanal arasında EN AZ 10 CM MESAFE bırakılmış mı?", critical: true },
+                    { id: "c7_4", ref: "Madde 25.8 - 25.13", text: "Kanal Yükseklik Kuralları: İlkokul koridorlarında (kiriş >= 220cm ise) en az 210 cm yükseklikte düz; kiriş yüksekliği 260 cm'den fazla olan yerlerde kirişin max 10cm altından döşenmiş mi?", critical: true },
+                    { id: "c7_5", ref: "Madde 25.16", text: "L Konsol ve Tij mesafeleri EN FAZLA 125 cm aralıklarla sabitlenmiş mi?", critical: false },
+                    { id: "c7_6", ref: "Madde 25.17", text: "Kesilen sac yüzeylerin çapakları temizlenmiş, çinko sprey/yağlı boya atılmış ve kablo temas yüzeylerine FİTİL TAKILMIŞ mı?", critical: true },
+                    { id: "c7_7", ref: "Madde 25.20", text: "Kiriş ve kolonlara KESİNLİKLE DELME İŞLEMİ YAPILMAMIŞ, etrafından dönülmüş mü?", critical: true },
+                    { id: "c7_8", ref: "Madde 25.24", text: "Sistem odasına gelen kablo sayısı 144'ten fazla ise sac tava zemine kadar indirilip kabinet altına sokulmuş mu?", critical: false }
+                ]
+            },
+            {
+                id: "sec8",
+                title: "8. Plastik (PVC) Kablo Kanalı Uygulaması",
+                badge: "Maddeler 26.1 - 27.45",
+                items: [
+                    { id: "c8_1", ref: "Madde 26.1 - 26.2", text: "PVC Kanallar: Ana hatlar 100x50 mm (et kalınlığı min 2mm), AP hatları 40x16 mm (et kalınlığı min 0.9mm), alev iletmez (UL-94 V-0) özellikte mi?", critical: false },
+                    { id: "c8_2", ref: "Madde 27.7", text: "100x50 mm PVC kanallar üzerindeki koruyucu marka folyoları iş tesliminde TAMAMEN SÖKÜLMÜŞ mü?", critical: false },
+                    { id: "c8_3", ref: "Madde 27.9 - 27.12", text: "Koridorda PVC kanal montajı vidalar pulları ile en fazla 25 cm aralıklarla altlı-üstlü dönüşümlü sıkılmış mı?", critical: false },
+                    { id: "c8_4", ref: "Madde 27.29", text: "DERSLİKLERDE PVC kanal montajında TÜM VİDA DELİKLERİNE (her 25cm'de çift vida) eksiksiz vida sıkılmış mı?", critical: true },
+                    { id: "c8_5", ref: "Madde 27.30", text: "Derslik Tahta İniş Kuralı: Tahta altı seviyesi ilkokulda zeminden 85 cm, ortaokul/lisede 95 cm yükseklikte mi? Dikey kanal tahta çerçevesinden 30 cm mesafeli inip yatayda tahta altına 32 cm giriyor mu?", critical: true },
+                    { id: "c8_6", ref: "Madde 27.30 - 27.32", text: "Dikeyden yataya dönüşte L aparat kullanılmayıp 90° yapıştırılmış mı? Dikey kanalın alt kapağı çıkarılamayacak şekilde silikon/aparat ile sabitlenmiş mi?", critical: true },
+                    { id: "c8_7", ref: "Madde 27.38 - 27.39", text: "İdari odalarda PVC kanal kapı arkasından tozluk seviyesine indirilip yatayda gidilmiş mi? Aydınlatma anahtarlarına engel oluşturmuyor mu?", critical: false }
+                ]
+            },
+            {
+                id: "sec9",
+                title: "9. UTP Bakır Kablo & Fiber Optik Tesisatı",
+                badge: "Maddeler 28.1 - 31.9",
+                items: [
+                    { id: "c9_1", ref: "Madde 28.1 - 28.5", text: "UTP Kablo: Cat6, 23 AWG katı bakır, LSOH/HFFR dış kılıflı, CPR Dca sınıfı yanmazlık belgeli mi?", critical: true },
+                    { id: "c9_2", ref: "Madde 29.2", text: "Kabinet içi kablo payı: 42U/26U/16U kabinetlerde 1 METRE, 9U/4U kabinetlerde 0.5 METRE pay bırakılmış mı?", critical: false },
+                    { id: "c9_3", ref: "Madde 29.3", text: "Kanal içi UTP kablo uzunluğu KESİNLİKLE 90 METREYİ geçmiyor mu?", critical: true },
+                    { id: "c9_4", ref: "Madde 29.21 - 29.24", text: "Tüm UTP hatlarına Fluke Testi (NEXT, Return Loss vb.) yapılmış, PASS alan raporlar cihaz seri nosu ve etiket adı ile İdareye sunulmuş mu?", critical: true },
+                    { id: "c9_5", ref: "Madde 29.25", text: "Kabloların her iki ucu IP51 şeffaf kılıflı etiket ile (A01, A02...) patch paneldeki port ismiyle birebir aynı etiketlenmiş mi?", critical: true },
+                    { id: "c9_6", ref: "Madde 31.3 - 31.5", text: "Binalar Arası Fiber Optik: 4 Core Single-Mode (SM) LC-LC çekilmiş mi? Gerdirme halatı min 5.50m yükseklikte mi? Yeraltı kazısı min 70 cm derinlikte ve 20cm üstüne ikaz bandı serilmiş mi?", critical: true }
+                ]
+            },
+            {
+                id: "sec10",
+                title: "10. Topraklama Sistemi Standartları",
+                badge: "Maddeler 34.1 - 34.13",
+                items: [
+                    { id: "c10_1", ref: "Madde 34.2.1", text: "Topraklama Çubuğu: 20 mm çapında, 60 cm uzunluğunda en az 3 adet SAF BAKIR (kaplama olmayan) çubuk kullanılmış mı?", critical: true },
+                    { id: "c10_2", ref: "Madde 34.2.2 - 34.6", text: "Topraklama Kablosu: 10 mm² kesitli (H07Z1-K) sarı-yeşil tek damar çok telli kablo ile bakır klemensler kullanılarak birleştirilmiş mi?", critical: true },
+                    { id: "c10_3", ref: "Madde 34.2.4 - 34.4", text: "Direnç Düşürücü: En az 20 kg Gem Tozu su ile macun yapılıp çubuk çukurlarına uygulanmış mı?", critical: true },
+                    { id: "c10_4", ref: "Madde 34.3.4", text: "Topraklama Direnç Değeri 0 (sıfır) ile 3 (üç) Ohm aralığında ölçüldü mü?", critical: true, note: "3 Ohm sağlanamıyorsa ilave çubuk çakılarak optimize edilmelidir." },
+                    { id: "c10_5", ref: "Madde 34.10", text: "Topraklama kablosunun bina dışı dikey yükselen kısmı Galvaniz Kaplı Çelik Boru içerisinden geçirilip her 1 metrede kelepçelenmiş mi?", critical: false },
+                    { id: "c10_6", ref: "Madde 34.13.2 - 34.13.5", text: "Panodan katlardaki sac tava toprak baralarına 4 mm² kablo çekilmiş mi? Sac tava başlarına topraklama kablosu bağlanıp içine 9x9cm Sarı 'TOPRAKLAMA' uyarı etiketi konulmuş mu?", critical: true }
+                ]
+            },
+            {
+                id: "sec11",
+                title: "11. FATİH Enerji Panoları & Linye Dağıtımı",
+                badge: "Maddeler 35.1 - 35.12",
+                items: [
+                    { id: "c11_1", ref: "Madde 35.2 - 35.6", text: "Pano Seçimi Uygun mu? Tip 1 (1-18 derslik), Tip 2 (19-30 derslik), Tip 3 (31-48 derslik / TMŞ'li), Tip 4 (49-66 derslik / TMŞ'li)?", critical: true },
+                    { id: "c11_2", ref: "Madde 35.3.2", text: "Pano içerisinde 30mA Kaçak Akım Koruma Rölesi (KAKR) ve R-S-T faz sinyal lambaları çalışır durumda mı?", critical: true },
+                    { id: "c11_3", ref: "Madde 35.8.1", text: "Linye Kuralı: Her bir linye sigortasına EN FAZLA 6 dersliğin enerji prizi bağlanmış mı?", critical: true },
+                    { id: "c11_4", ref: "Madde 35.8.8", text: "Her panoda 1 adet B tipi 1x16A Otomatik Sigorta YEDEK bırakılmış mı?", critical: false },
+                    { id: "c11_5", ref: "Madde 35.10.3 - 35.10.8", text: "Linye Buatına max 3 derslik bağlanmış mı? Derslik sayısı > 9 ise toplayıcı buat kullanılıp panoya 3x4 mm² kablo ile gidilmiş mi?", critical: false },
+                    { id: "c11_6", ref: "Madde 35.10.10", text: "Tahta Prizleri: Metal koruma kapaklı, vidaları özel kırılmaz/açılmaz vida ile duvara sabitlenmiş mi?", critical: true },
+                    { id: "c11_7", ref: "Madde 35.11.6", text: "Priz Bağlantı Yönü: Prizde dikey PVC tarafına yakın olan delik FAZ, diğeri NÖTR olarak çapraz bağlanmış mı?", critical: false },
+                    { id: "c11_8", ref: "Madde 35.12.12", text: "Pano Dış Kapağında Kırmızı Baskı: 'ACİL DURUMLAR HARİÇ PANO ENERJİSİNİ KESİNLİKLE KESMEYİNİZ!' uyarısı baskı olarak yer alıyor mu?", critical: true }
+                ]
+            },
+            {
+                id: "sec12",
+                title: "12. Aktif Cihazlar & Yönetim Yazılımı",
+                badge: "Maddeler 13.1 - 23.2",
+                items: [
+                    { id: "c12_1", ref: "Madde 13.4 - 13.6", text: "Tüm aktif cihazlar (Switch, AP, SFP, Yönetim Yazılımı) aynı marka ve Türkiye ofisi bulunan üreticiye mi ait?", critical: true },
+                    { id: "c12_2", ref: "Madde 14.2 / 22.36", text: "Ethernet Anahtarlar ve AP'ler Zero Touch Provisioning (ZTP) ve DHCP Option desteğine sahip mi?", critical: false },
+                    { id: "c12_3", ref: "Madde 13.12 / 22.19", text: "Sistem EBA Portal / Web Kimlik Doğrulama, 802.1x ve MAC yetkilendirmeyi sorunsuz gerçekleştiriyor mu?", critical: true },
+                    { id: "c12_4", ref: "Madde 15.5 / 17.5", text: "PoE Switchler 802.3at (PoE+) destekli ve elektrik kesilip gelmesinde kesintisiz PoE (Perpetual/Always-on PoE) sağlıyor mu?", critical: true },
+                    { id: "c12_5", ref: "Madde 22.13 - 22.14", text: "Access Pointler: Wi-Fi 6 / 6E (802.11ax/be) destekli, en az 3560 Mbps hızında ve harici antensiz (dahili antenli) mi?", critical: false },
+                    { id: "c12_6", ref: "Madde 23.2.17", text: "Kablosuz Ağ Yönetim Sisteminde okul kat planları yüklü ve Isı Haritası (Heatmap) oluşturulabiliyor mu?", critical: false }
+                ]
+            },
+            {
+                id: "sec13",
+                title: "13. Keşif, Kabul, Garanti & SLA Cezaları",
+                badge: "Maddeler 36.1 - 49.10",
+                items: [
+                    { id: "c13_1", ref: "Madde 36.5", text: "Her bir binadaki altyapı kurulumları işe başlama tarihinden itibaren 1 (BİR) AY içerisinde tamamlandı mı?", critical: true },
+                    { id: "c13_2", ref: "Madde 40.1 - 40.3", text: "Mahalli Kontrol Teşkilatı oluşturuldu mu? (Başkan: Okul Müdürü, 1. Üye: İl/İlçe BT Koordinatörü, 2. Üye: Elektrik/BT Uzmanı)", critical: true },
+                    { id: "c13_3", ref: "Madde 48.3 - 48.4", text: "Garanti Süresi: Merkezi Kesin Kabul tarihinden itibaren 5 (BEŞ) YIL boyunca Yüklenici arıza gidermekle yükümlü mü?", critical: true },
+                    { id: "c13_4", ref: "Madde 49.3", text: "Arıza SLA Süresi: FatihPYS üzerinden bildirilen arızalara en geç 5 (BEŞ) İŞ GÜNÜ içerisinde müdahale edilip gideriliyor mu?", critical: true, note: "Giderilmeyen her gün için okul başına 300 TL SLA cezası uygulanır." },
+                    { id: "c13_5", ref: "Madde 49.7", text: "Onaysız Ürün Cezası: Şartname onay almadan kullanılan ürün tespiti durumunda 10 gün içinde değişim + 50.000 TL ceza uygulanacağı tebliğ edildi mi?", critical: true }
+                ]
+            }
+        ];
+
+        // ===== Çoklu Okul Depolama (Multi-School Storage) =====
+        // Her okulun kendi checkedState / itemNotes / schoolInfo / calcData bloğu vardır.
+        // Böylece bir okulun denetimi tamamlanmadan diğerine geçilip kaldığı yerden devam edilebilir.
+        const SCHOOLS_STORE_KEY = 'yegitek_f4_schools_store_v1';
+        let schoolsStore = null;
+
+        function generateSchoolId() {
+            return 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
+
+        function blankSchool(name) {
+            return {
+                checkedState: {},
+                itemNotes: {},
+                schoolInfo: { schoolName: name || '', auditDate: '' },
+                calcData: { tavan: '', kirisZemin: '', kirisAralik: '' }
+            };
+        }
+
+        function loadOrMigrateStore() {
+            const raw = JSON.parse(localStorage.getItem(SCHOOLS_STORE_KEY));
+            if (raw && raw.schools && raw.order && raw.order.length > 0) {
+                schoolsStore = raw;
+                return;
+            }
+
+            // Eski (tek okul) veri formatından geçiş: daha önce kaydedilmiş veri varsa kaybetmeden aktar
+            const oldChecklist = JSON.parse(localStorage.getItem('yegitek_f4_checklist')) || {};
+            const oldNotes = JSON.parse(localStorage.getItem('yegitek_f4_item_notes')) || {};
+            const oldSchoolInfo = JSON.parse(localStorage.getItem('yegitek_f4_school_info')) || {};
+            const oldCalc = JSON.parse(localStorage.getItem('yegitek_f4_sac_kanal_calc')) || {};
+
+            const id = generateSchoolId();
+            const migratedSchool = {
+                checkedState: oldChecklist,
+                itemNotes: oldNotes,
+                schoolInfo: {
+                    schoolName: oldSchoolInfo.schoolName || '',
+                    auditDate: oldSchoolInfo.auditDate || ''
+                },
+                calcData: {
+                    tavan: oldCalc.tavan !== undefined ? oldCalc.tavan : '',
+                    kirisZemin: oldCalc.kirisZemin !== undefined ? oldCalc.kirisZemin : '',
+                    kirisAralik: oldCalc.kirisAralik !== undefined ? oldCalc.kirisAralik : ''
+                }
+            };
+
+            schoolsStore = {
+                activeId: id,
+                order: [id],
+                schools: { [id]: migratedSchool }
+            };
+            saveStore();
+
+            // Eski anahtarları temizle (artık tek kaynaktan yönetiliyor)
+            localStorage.removeItem('yegitek_f4_checklist');
+            localStorage.removeItem('yegitek_f4_item_notes');
+            localStorage.removeItem('yegitek_f4_school_info');
+            localStorage.removeItem('yegitek_f4_sac_kanal_calc');
+        }
+
+        function saveStore() {
+            localStorage.setItem(SCHOOLS_STORE_KEY, JSON.stringify(schoolsStore));
+        }
+
+        function getActiveSchool() {
+            return schoolsStore.schools[schoolsStore.activeId];
+        }
+
+        function schoolLabel(id) {
+            const s = schoolsStore.schools[id];
+            const name = s && s.schoolInfo && s.schoolInfo.schoolName && s.schoolInfo.schoolName.trim();
+            if (name) return name;
+            const idx = schoolsStore.order.indexOf(id);
+            return `İsimlendirilmemiş Okul ${idx + 1}`;
+        }
+
+        function loadActiveSchoolIntoState() {
+            const s = getActiveSchool();
+            checkedState = s.checkedState;
+            itemNotes = s.itemNotes;
+        }
+
+        // Aktif okulun tüm ekranlarını (liste, ilerleme, alanlar, hesaplayıcı, seçici) yeniden çizer.
+        // renderContent() hesaplayıcı kutusunu DOM'dan sıfırdan oluşturduğu için, hesaplayıcı alanları
+        // her zaman renderContent()'ten SONRA doldurulmalıdır.
+        function refreshUIForActiveSchool() {
+            renderContent();
+            updateProgress();
+            updateNavCounters();
+            loadSchoolInfoFields();
+            loadSacKanalCalcFields();
+            renderSchoolSelector();
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                filterItems();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderSchoolSelector() {
+            const sel = document.getElementById('schoolSelect');
+            if (!sel) return;
+            sel.innerHTML = '';
+            schoolsStore.order.forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = schoolLabel(id);
+                sel.appendChild(opt);
+            });
+            sel.value = schoolsStore.activeId;
+        }
+
+        function handleSchoolSwitch(newId) {
+            if (!newId || !schoolsStore.schools[newId] || newId === schoolsStore.activeId) return;
+            schoolsStore.activeId = newId;
+            saveStore();
+            loadActiveSchoolIntoState();
+            refreshUIForActiveSchool();
+        }
+
+        function addNewSchool() {
+            const name = prompt('Yeni okulun adını girin (boş bırakırsanız sonra "Denetimi Yapılan Okul" alanından girebilirsiniz):', '');
+            if (name === null) return; // kullanıcı iptal etti
+            const id = generateSchoolId();
+            schoolsStore.schools[id] = blankSchool(name ? name.trim() : '');
+            schoolsStore.order.push(id);
+            schoolsStore.activeId = id;
+            saveStore();
+            loadActiveSchoolIntoState();
+            refreshUIForActiveSchool();
+            const nameInput = document.getElementById('schoolNameInput');
+            if (nameInput && !nameInput.value) nameInput.focus();
+        }
+
+        function deleteCurrentSchool() {
+            if (schoolsStore.order.length <= 1) {
+                alert('En az bir okul kaydı bulunmalıdır. Bu tek kaydı silemezsiniz; dilerseniz üzerine yeni bir okul adı yazabilirsiniz.');
+                return;
+            }
+            const label = schoolLabel(schoolsStore.activeId);
+            if (!confirm(`"${label}" okulunu ve TÜM denetim verilerini (işaretler, notlar, hesaplayıcı) kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+                return;
+            }
+            const idx = schoolsStore.order.indexOf(schoolsStore.activeId);
+            delete schoolsStore.schools[schoolsStore.activeId];
+            schoolsStore.order.splice(idx, 1);
+            const newIdx = Math.max(0, idx - 1);
+            schoolsStore.activeId = schoolsStore.order[newIdx];
+            saveStore();
+            loadActiveSchoolIntoState();
+            refreshUIForActiveSchool();
+        }
+
+        // ===== Tam Yedek Alma / Geri Yükleme (Export / Import) =====
+        function exportAllData() {
+            try {
+                const backup = {
+                    app: 'yegitek_f4_denetim',
+                    exportedAt: new Date().toISOString(),
+                    store: schoolsStore
+                };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const now = new Date();
+                const dateStr = now.toISOString().slice(0, 10);
+                a.href = url;
+                a.download = `okul-denetim-yedek-${dateStr}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('Yedek dosyası oluşturulurken bir hata oluştu: ' + err.message);
+            }
+        }
+
+        function triggerImportFile() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function importAllData(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                let parsed;
+                try {
+                    parsed = JSON.parse(e.target.result);
+                } catch (err) {
+                    alert('Bu dosya geçerli bir yedek dosyası değil (JSON olarak okunamadı).');
+                    event.target.value = '';
+                    return;
+                }
+
+                // Yeni format {store:{...}} veya doğrudan eski store objesi kabul edilir
+                const importedStore = (parsed && parsed.store) ? parsed.store : parsed;
+                if (!importedStore || !importedStore.schools || !importedStore.order || !importedStore.order.length) {
+                    alert('Bu dosya beklenen yedek formatında değil ya da içinde okul kaydı yok.');
+                    event.target.value = '';
+                    return;
+                }
+
+                const schoolCount = importedStore.order.length;
+                const doReplace = confirm(
+                    `Yedek dosyasında ${schoolCount} okul kaydı bulundu.\n\n` +
+                    `TAMAM: Şu an cihazınızda kayıtlı TÜM okulların YERİNE bu yedeği yükler (mevcut kayıtlar silinir).\n` +
+                    `İPTAL: Bu yedekteki okulları, mevcut okullarınızın YANINA ekler (hiçbir şey silinmez).`
+                );
+
+                if (doReplace) {
+                    schoolsStore = importedStore;
+                } else {
+                    if (!schoolsStore) { schoolsStore = { activeId: null, order: [], schools: {} }; }
+                    const addedIds = [];
+                    importedStore.order.forEach(oldId => {
+                        const schoolData = importedStore.schools[oldId];
+                        if (!schoolData) return;
+                        const newId = generateSchoolId();
+                        schoolsStore.schools[newId] = schoolData;
+                        schoolsStore.order.push(newId);
+                        addedIds.push(newId);
+                    });
+                    if (addedIds.length) {
+                        schoolsStore.activeId = addedIds[0];
+                    }
+                }
+
+                saveStore();
+                loadActiveSchoolIntoState();
+                refreshUIForActiveSchool();
+                alert('Yedek başarıyla içe aktarıldı.');
+                event.target.value = '';
+            };
+            reader.onerror = function () {
+                alert('Dosya okunurken bir hata oluştu.');
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // Aktif okulun canlı state referansları (renderNav/renderContent/updateProgress vb. bunları kullanır)
+        let checkedState = {};
+        let itemNotes = {};
+
+        function saveItemNote(itemId, value) {
+            itemNotes[itemId] = value;
+            saveStore();
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Bölümlerin açık/kapalı durumunu tutar (mobilde varsayılan kapalı başlar)
+        let sectionCollapsed = {};
+
+        function initApp() {
+            loadOrMigrateStore();
+            loadActiveSchoolIntoState();
+
+            const isMobile = window.innerWidth <= 850;
+            checklistData.forEach((sec, idx) => {
+                sectionCollapsed[sec.id] = idx !== 0; // Kalabalık olmasın diye başlangıçta sadece ilk bölüm açık
+            });
+            if (isMobile) {
+                document.getElementById('navSidebar').classList.add('collapsed');
+                document.getElementById('navToggleIcon').textContent = '▶';
+            }
+
+            renderNav();
+            renderContent();
+            updateProgress();
+            updateNavCounters();
+            loadSchoolInfoFields();
+            loadSacKanalCalc();
+            renderSchoolSelector();
+            setupScrollUX();
+        }
+
+        function toggleNavSidebar() {
+            const navSidebar = document.getElementById('navSidebar');
+            navSidebar.classList.toggle('collapsed');
+            document.getElementById('navToggleIcon').textContent = navSidebar.classList.contains('collapsed') ? '▶' : '▼';
+        }
+
+        function toggleSection(secId) {
+            sectionCollapsed[secId] = !sectionCollapsed[secId];
+            const card = document.getElementById(secId);
+            if (card) {
+                card.classList.toggle('collapsed', sectionCollapsed[secId]);
+            }
+        }
+
+        function setupScrollUX() {
+            const backBtn = document.getElementById('backToTopBtn');
+            const progressSection = document.querySelector('.progress-section');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 350) {
+                    backBtn.classList.add('visible');
+                } else {
+                    backBtn.classList.remove('visible');
+                }
+                if (window.scrollY > 10) {
+                    progressSection.style.boxShadow = '0 3px 10px rgba(0,0,0,0.12)';
+                } else {
+                    progressSection.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                }
+            });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadSchoolInfoFields() {
+            const s = getActiveSchool();
+            const info = (s && s.schoolInfo) || {};
+            document.getElementById('schoolNameInput').value = info.schoolName || '';
+            document.getElementById('auditDateInput').value = info.auditDate || '';
+        }
+
+        function saveSchoolInfo() {
+            const s = getActiveSchool();
+            s.schoolInfo = {
+                schoolName: document.getElementById('schoolNameInput').value,
+                auditDate: document.getElementById('auditDateInput').value
+            };
+            saveStore();
+            renderSchoolSelector(); // seçilen okulun adı değiştiyse açılır listeye anında yansısın
+
+            // Okul adı değiştiğinde İlkokul tespiti de değişebileceği için, açıksa hesaplayıcıyı yeniden çalıştır
+            if (document.getElementById('sacKanalResult')) {
+                calculateSacKanal();
+            }
+        }
+
+        // ===== Sac Kablo Kanalı Yerleşim Hesaplayıcı (Madde 25.8 - 25.14) =====
+
+        function isIlkokulSchool() {
+            const raw = document.getElementById('schoolNameInput').value || '';
+            const upper = raw.toLocaleUpperCase('tr-TR');
+            return upper.includes('İLKOKUL') || upper.includes('ILKOKUL');
+        }
+
+        function saveSacKanalCalc() {
+            const s = getActiveSchool();
+            s.calcData = {
+                tavan: document.getElementById('calcTavan').value,
+                kirisZemin: document.getElementById('calcKirisZemin').value,
+                kirisAralik: document.getElementById('calcKirisAralik').value
+            };
+            saveStore();
+        }
+
+        // Geriye dönük uyumluluk için eski isim de aynı işi yapar
+        function loadSacKanalCalc() {
+            loadSacKanalCalcFields();
+        }
+
+        function loadSacKanalCalcFields() {
+            const s = getActiveSchool();
+            const saved = (s && s.calcData) || {};
+            if (!document.getElementById('calcTavan')) return; // Bölüm 7 DOM'da değilse sessizce çık
+            if (saved.tavan !== undefined) document.getElementById('calcTavan').value = saved.tavan;
+            if (saved.kirisZemin !== undefined) document.getElementById('calcKirisZemin').value = saved.kirisZemin;
+            if (saved.kirisAralik !== undefined) document.getElementById('calcKirisAralik').value = saved.kirisAralik;
+            calculateSacKanal();
+        }
+
+        function calculateSacKanal() {
+            const resultBox = document.getElementById('sacKanalResult');
+            const schoolTypeBox = document.getElementById('calcSchoolType');
+            if (!resultBox) return; // Bölüm 7 henüz DOM'da değilse (collapsed vs.) sessizce çık
+
+            saveSacKanalCalc();
+
+            const tavanRaw = document.getElementById('calcTavan').value;
+            const H = parseFloat(document.getElementById('calcKirisZemin').value);
+            const D = parseFloat(document.getElementById('calcKirisAralik').value);
+            const T = parseFloat(tavanRaw);
+
+            const isIlkokul = isIlkokulSchool();
+            const schoolName = (document.getElementById('schoolNameInput').value || '').trim();
+            if (schoolName) {
+                schoolTypeBox.innerHTML = `Tespit edilen okul türü: <b>${isIlkokul ? 'İlkokul' : 'İlkokul Değil (Ortaokul/Lise/Anaokulu vb.)'}</b> <span style="color:#94a3b8;">(“Denetimi Yapılan Okul” alanına göre otomatik belirlenir)</span>`;
+            } else {
+                schoolTypeBox.innerHTML = `⚠️ Okul türü tespit edilemedi — üstteki <b>"Denetimi Yapılan Okul"</b> alanını doldurunuz (İlkokul ise adında "İlkokul" geçmelidir).`;
+            }
+
+            if (isNaN(H)) {
+                resultBox.innerHTML = '<div class="calc-empty-hint">Hesaplama için en az "Kiriş ile Zemin Arası Yükseklik" değerini giriniz.</div>';
+                return;
+            }
+
+            let cards = [];
+
+            // Fiziksel mantık kontrolü: Tavan yüksekliği kiriş-zemin yüksekliğinden az olamaz
+            if (!isNaN(T) && T > 0 && T < H) {
+                cards.push({ cls: 'warning', html: `⚠️ Girilen <b>Tavan Yüksekliği (${T} cm)</b>, <b>Kiriş-Zemin Yüksekliği (${H} cm)</b>'nden düşük görünüyor. Lütfen ölçümleri kontrol ediniz.` });
+            }
+
+            const triggered = [];
+
+            // Madde 25.8 (sadece İlkokul) / 220-260 tanımsız aralık (İlkokul değil)
+            if (H >= 220) {
+                if (isIlkokul) {
+                    triggered.push({
+                        madde: 'Madde 25.8',
+                        text: 'İlkokul koridorlarına uygulanacak sac kablo kanalları, kiriş ile zemin arasındaki yükseklik 220 cm veya daha fazla ise, sac kablo kanalı zemine paralel olarak düz bir şekilde, zemin seviyesinden en az 210 cm yükseklikte döşenecektir.'
+                    });
+                } else if (H <= 260) {
+                    cards.push({ cls: 'undefined', html: `⛔ <b>Tanımsız Aralık:</b> Okul İlkokul olarak tespit edilmedi ve Kiriş-Zemin Yüksekliği (${H} cm) 220-260 cm aralığında. Bu aralık şartnamede tanımlı değildir; uygulama şekli <b>İDARE ile görüşülerek</b> netleştirilmelidir.` });
+                }
+            }
+
+            // Madde 25.9 / 25.10 (H < 220 cm)
+            if (H < 220) {
+                if (isNaN(D)) {
+                    cards.push({ cls: 'warning', html: `Kiriş ile zemin arasındaki yükseklik (${H} cm) 220 cm'den düşük. Doğru maddeyi belirlemek için <b>"Kirişler Arası Mesafe"</b> değerini de giriniz.` });
+                } else if (D >= 300) {
+                    triggered.push({
+                        madde: 'Madde 25.9',
+                        text: "Kiriş ile zemin arasındaki yükseklik 220 cm'den düşük ve kirişler arası mesafenin en az 3 metre olduğu yerlerde sac tavalar kirişin/tavanın en fazla 10 cm altından DALGALI yapıda döşenmelidir."
+                    });
+                } else {
+                    triggered.push({
+                        madde: 'Madde 25.10',
+                        text: "Kiriş ile zemin arasındaki yükseklik 220 cm'den düşük ve kirişler arası mesafenin 3 metreden az olduğu yerlerde sac kablo kanalları kirişin/tavanın en fazla 10 cm altından ZEMİNE PARALEL döşenmelidir."
+                    });
+                }
+            }
+
+            // Madde 25.11 (H > 260)
+            if (H > 260) {
+                triggered.push({
+                    madde: 'Madde 25.11',
+                    text: "Kiriş ile zemin arasındaki mesafe 260 cm'den fazla olan yerlerde sac kablo kanalları kirişin/tavanın en fazla 10 cm altından zemine paralel olarak döşenmelidir."
+                });
+            }
+
+            // Madde 25.12 - 1. kısım (H < 260)
+            if (H < 260) {
+                triggered.push({
+                    madde: 'Madde 25.12 (1. kısım)',
+                    text: "Kiriş ile zemin arasındaki mesafe 260 cm'den küçük olan koridorlarda orijinal sac kablo kanal aparatları kullanılarak kirişler dönülerek tavana yakın mesafede montajlanacaktır."
+                });
+            }
+
+            // Madde 25.12 - 2. kısım (H > 300)
+            if (H > 300) {
+                triggered.push({
+                    madde: 'Madde 25.12 (2. kısım)',
+                    text: "Kiriş ile zemin arasındaki mesafe 300 cm'den fazla olan yerlerde sac kablo kanalları 280 cm'den döşenecektir."
+                });
+            }
+
+            // Madde 25.13 (H > 280)
+            if (H > 280) {
+                triggered.push({
+                    madde: 'Madde 25.13',
+                    text: "Kiriş ile zemin arasındaki mesafe 280 cm'den büyük olan koridorlarda sac kablo kanalları zemine paralel ve 280 cm'den döşenecektir."
+                });
+            }
+
+            if (triggered.length > 1) {
+                cards.push({ cls: 'multi-note', html: 'Bu yükseklik aralığında şartnamede birden fazla madde geçerli olabilir; denetçi aşağıdaki maddelerin tümünü inceleyerek sahadaki uygulamayı buna göre değerlendirmelidir.' });
+            }
+
+            triggered.forEach(t => {
+                cards.push({ cls: 'rule', html: `<b>${t.madde}:</b> ${t.text}` });
+            });
+
+            if (triggered.length > 0) {
+                cards.push({ cls: 'reminder', html: `📌 <b>Sabit Hatırlatmalar:</b> Madde 25.7 — Kanal ile tavan/kiriş arasında kapağın açılabilmesi için en az 10 cm boşluk bırakılmalıdır. Madde 25.14 — Kanal güzergâhında dalgalanma/eğiklik yapılmayacak, montaj lazer terazi ile hizalanacaktır.` });
+            }
+
+            resultBox.innerHTML = cards.map(c => `<div class="calc-result-card ${c.cls}">${c.html}</div>`).join('');
+        }
+
+        function renderNav() {
+            const navList = document.getElementById('navList');
+            navList.innerHTML = '';
+
+            checklistData.forEach((sec, idx) => {
+                const total = sec.items.length;
+                const checked = sec.items.filter(item => checkedState[item.id]).length;
+
+                const li = document.createElement('li');
+                li.className = `nav-item ${idx === 0 ? 'active' : ''}`;
+                li.onclick = () => scrollToSection(sec.id, li);
+                li.innerHTML = `
+                    <span>${sec.title.split('.')[0]}. ${sec.title.split('&')[0].substring(3, 20)}...</span>
+                    <span class="nav-counter" id="nav-counter-${sec.id}">${checked}/${total}</span>
+                `;
+                navList.appendChild(li);
+            });
+        }
+
+        function renderContent() {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '';
+
+            checklistData.forEach(sec => {
+                const total = sec.items.length;
+                const checked = sec.items.filter(item => checkedState[item.id]).length;
+                const isComplete = total > 0 && checked === total;
+
+                const card = document.createElement('div');
+                card.className = `section-card ${sectionCollapsed[sec.id] ? 'collapsed' : ''}`;
+                card.id = sec.id;
+
+                let itemsHtml = '';
+                sec.items.forEach(item => {
+                    const isChecked = !!checkedState[item.id];
+                    itemsHtml += `
+                        <div class="check-item ${isChecked ? 'checked' : ''}" id="item-container-${item.id}">
+                            <input type="checkbox" class="custom-checkbox" id="${item.id}" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${item.id}', '${sec.id}')">
+                            <div class="item-content">
+                                <label for="${item.id}" class="item-text">${item.text}</label>
+                                <div class="item-meta">
+                                    <span class="ref-tag">${item.ref}</span>
+                                    ${item.critical ? '<span class="critical-tag">KRİTİK KONTROL</span>' : ''}
+                                </div>
+                                <div class="desc-box-wrapper">
+                                    <label class="desc-label" for="desc-${item.id}">📝 Not / Açıklama (opsiyonel):</label>
+                                    <textarea class="desc-input" id="desc-${item.id}" placeholder="Bu madde ile ilgili eksik, hatırlatma veya açıklama notunuzu buraya yazabilirsiniz..." oninput="saveItemNote('${item.id}', this.value)">${escapeHtml(itemNotes[item.id] || '')}</textarea>
+                                </div>
+                                ${item.note ? `<div class="note-box">💡 <b>Not:</b> ${item.note}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const calcBoxHtml = sec.id === 'sec7' ? `
+                    <div class="calc-box">
+                        <div class="calc-box-title">📐 Sac Kablo Kanalı Yerleşim Hesaplayıcı (Madde 25.8 - 25.14)</div>
+                        <div class="calc-box-desc">Ölçümleri girin; şartnameye göre uygulanması gereken madde(ler) otomatik olarak listelenecektir.</div>
+                        <div class="calc-grid">
+                            <div class="calc-field">
+                                <label for="calcTavan">Tavan Yüksekliği (cm)</label>
+                                <input type="number" id="calcTavan" min="0" placeholder="Örn: 320" oninput="calculateSacKanal()">
+                            </div>
+                            <div class="calc-field">
+                                <label for="calcKirisZemin">Kiriş ile Zemin Arası Yükseklik (cm)</label>
+                                <input type="number" id="calcKirisZemin" min="0" placeholder="Örn: 240" oninput="calculateSacKanal()">
+                            </div>
+                            <div class="calc-field">
+                                <label for="calcKirisAralik">Kirişler Arası Mesafe (cm)</label>
+                                <input type="number" id="calcKirisAralik" min="0" placeholder="Örn: 280" oninput="calculateSacKanal()">
+                            </div>
+                        </div>
+                        <div class="calc-school-type" id="calcSchoolType"></div>
+                        <div class="calc-results" id="sacKanalResult">
+                            <div class="calc-empty-hint">Hesaplama için en az "Kiriş ile Zemin Arası Yükseklik" değerini giriniz.</div>
+                        </div>
+                    </div>
+                ` : '';
+
+                card.innerHTML = `
+                    <div class="section-header" onclick="toggleSection('${sec.id}')">
+                        <h2>${sec.title}</h2>
+                        <div class="section-header-right">
+                            <span class="section-progress-badge ${isComplete ? 'complete' : ''}" id="sec-progress-${sec.id}">${checked}/${total}</span>
+                            <span class="sec-badge">${sec.badge}</span>
+                            <span class="section-toggle-icon">▼</span>
+                        </div>
+                    </div>
+                    ${calcBoxHtml}
+                    <div class="checklist-group">
+                        ${itemsHtml}
+                    </div>
+                `;
+
+                contentArea.appendChild(card);
+            });
+        }
+
+        function toggleCheck(itemId, secId) {
+            const checkbox = document.getElementById(itemId);
+            const container = document.getElementById(`item-container-${itemId}`);
+
+            checkedState[itemId] = checkbox.checked;
+            saveStore();
+
+            if (checkbox.checked) {
+                container.classList.add('checked');
+            } else {
+                container.classList.remove('checked');
+            }
+
+            updateProgress();
+            updateNavCounters();
+        }
+
+        function updateProgress() {
+            let totalItems = 0;
+            let checkedItems = 0;
+
+            checklistData.forEach(sec => {
+                sec.items.forEach(item => {
+                    totalItems++;
+                    if (checkedState[item.id]) checkedItems++;
+                });
+            });
+
+            const percentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressText').innerText = `${checkedItems} / ${totalItems} (%${percentage})`;
+        }
+
+        function updateNavCounters() {
+            checklistData.forEach(sec => {
+                const total = sec.items.length;
+                const checked = sec.items.filter(item => checkedState[item.id]).length;
+                const counterElem = document.getElementById(`nav-counter-${sec.id}`);
+                if (counterElem) {
+                    counterElem.innerText = `${checked}/${total}`;
+                }
+                const badgeElem = document.getElementById(`sec-progress-${sec.id}`);
+                if (badgeElem) {
+                    badgeElem.innerText = `${checked}/${total}`;
+                    badgeElem.classList.toggle('complete', total > 0 && checked === total);
+                }
+            });
+        }
+
+        function scrollToSection(secId, navElem) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navElem.classList.add('active');
+
+            sectionCollapsed[secId] = false;
+            const elem = document.getElementById(secId);
+            if (elem) {
+                elem.classList.remove('collapsed');
+                const yOffset = -120;
+                const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+
+            if (window.innerWidth <= 850) {
+                document.getElementById('navSidebar').classList.add('collapsed');
+                document.getElementById('navToggleIcon').textContent = '▶';
+            }
+        }
+
+        function filterItems() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+
+            checklistData.forEach(sec => {
+                let secHasVisibleItem = false;
+
+                sec.items.forEach(item => {
+                    const itemContainer = document.getElementById(`item-container-${item.id}`);
+                    const matchText = item.text.toLowerCase().includes(query);
+                    const matchRef = item.ref.toLowerCase().includes(query);
+
+                    if (matchText || matchRef) {
+                        itemContainer.style.display = 'flex';
+                        secHasVisibleItem = true;
+                    } else {
+                        itemContainer.style.display = 'none';
+                    }
+                });
+
+                const secCard = document.getElementById(sec.id);
+                if (secHasVisibleItem) {
+                    secCard.style.display = 'block';
+                    if (query) {
+                        secCard.classList.remove('collapsed');
+                    } else {
+                        secCard.classList.toggle('collapsed', !!sectionCollapsed[sec.id]);
+                    }
+                } else {
+                    secCard.style.display = 'none';
+                }
+            });
+        }
+
+        function resetProgress() {
+            if (confirm("Sadece AKTİF OKUL için tüm kontrol işaretlerini sıfırlamak istediğinize emin misiniz? (Okul adı, notlar ve hesaplayıcı değerleri korunacak; diğer okullarınız etkilenmeyecektir.)")) {
+                const s = getActiveSchool();
+                s.checkedState = {};
+                checkedState = s.checkedState;
+                saveStore();
+                renderContent();
+                updateProgress();
+                updateNavCounters();
+                loadSacKanalCalcFields(); // Hesaplayıcı ölçümleri "kontrol işaretleri" kapsamında değildir, korunur
+            }
+        }
+
+        function exportReport() {
+            const schoolName = document.getElementById('schoolNameInput').value.trim();
+            const auditDateRaw = document.getElementById('auditDateInput').value;
+
+            if (!schoolName) {
+                alert("Lütfen önce arama çubuğunun üzerindeki 'Denetimi Yapılan Okul' alanını doldurun.");
+                document.getElementById('schoolNameInput').focus();
+                return;
+            }
+
+            const auditDateDisplay = auditDateRaw
+                ? new Date(auditDateRaw + 'T00:00:00').toLocaleDateString('tr-TR')
+                : new Date().toLocaleDateString('tr-TR');
+
+            // Style tanımları
+            const headerStyle = {
+                font: { bold: true, sz: 12, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: "1A365D" } },
+                alignment: { horizontal: "center", vertical: "center", wrapText: true },
+                border: { top: { style: "thin", color: { rgb: "999999" } }, bottom: { style: "thin", color: { rgb: "999999" } }, left: { style: "thin", color: { rgb: "999999" } }, right: { style: "thin", color: { rgb: "999999" } } }
+            };
+            const titleStyle = { font: { bold: true, sz: 14, color: { rgb: "1A365D" } } };
+            const subTitleStyle = { font: { bold: false, sz: 10, color: { rgb: "718096" } } };
+            const sectionStyle = {
+                font: { bold: true, sz: 11, color: { rgb: "FFFFFF" } },
+                fill: { fgColor: { rgb: "2B6CB0" } },
+                alignment: { vertical: "center", wrapText: true }
+            };
+            const checkedFill = { rgb: "C6EFCE" };
+            const uncheckedFill = { rgb: "FFC7CE" };
+            const checkedFont = { rgb: "006100" };
+            const uncheckedFont = { rgb: "9C0006" };
+            const baseBorder = { top: { style: "thin", color: { rgb: "E2E8F0" } }, bottom: { style: "thin", color: { rgb: "E2E8F0" } }, left: { style: "thin", color: { rgb: "E2E8F0" } }, right: { style: "thin", color: { rgb: "E2E8F0" } } };
+
+            function dataCellStyle(isChecked, bold) {
+                return {
+                    font: { color: { rgb: isChecked ? checkedFont.rgb : uncheckedFont.rgb }, bold: !!bold },
+                    fill: { fgColor: { rgb: isChecked ? checkedFill.rgb : uncheckedFill.rgb } },
+                    alignment: { vertical: "top", wrapText: true },
+                    border: baseBorder
+                };
+            }
+
+            // Sayfa verisini oluştur
+            const aoa = [];
+            aoa.push(["T.C. MİLLÎ EĞİTİM BAKANLIĞI - ZONGULDAK YEĞİTEK"]);
+            aoa.push(["FATİH Projesi Faz-4 Yerel Alan Ağı (LAN) Kurulum ve Denetim Raporu"]);
+            aoa.push([`Okul: ${schoolName}    |    Denetim Tarihi: ${auditDateDisplay}    |    Rapor Oluşturulma: ${new Date().toLocaleString('tr-TR')}`]);
+            aoa.push([]);
+            aoa.push(["Bölüm / Madde No", "Kontrol Maddesi", "Kullanıcı Notu / Açıklama", "Kritik mi?", "Durum"]);
+
+            let totalItems = 0;
+            let checkedItems = 0;
+
+            const merges = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } }
+            ];
+
+            const rowStyles = {}; // rowIndex -> {isChecked, isSectionHeader}
+            rowStyles[0] = { style: titleStyle };
+            rowStyles[1] = { style: subTitleStyle };
+            rowStyles[2] = { style: subTitleStyle };
+            rowStyles[4] = { style: headerStyle, isHeaderRow: true };
+
+            checklistData.forEach(sec => {
+                const rIdx = aoa.length;
+                aoa.push([sec.title, "", "", "", ""]);
+                merges.push({ s: { r: rIdx, c: 0 }, e: { r: rIdx, c: 4 } });
+                rowStyles[rIdx] = { style: sectionStyle, isSectionRow: true };
+
+                sec.items.forEach(item => {
+                    const isChecked = !!checkedState[item.id];
+                    totalItems++;
+                    if (isChecked) checkedItems++;
+
+                    const dIdx = aoa.length;
+                    aoa.push([
+                        item.ref,
+                        item.text,
+                        (itemNotes[item.id] && itemNotes[item.id].trim()) ? itemNotes[item.id].trim() : "-",
+                        item.critical ? "KRİTİK" : "-",
+                        isChecked ? "✔ TAMAMLANDI" : "✘ TAMAMLANMADI"
+                    ]);
+                    rowStyles[dIdx] = { isDataRow: true, isChecked: isChecked };
+                });
+            });
+
+            const summaryRowIdx = aoa.length;
+            const percentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+            aoa.push([]);
+            aoa.push([`GENEL İLERLEME: ${checkedItems} / ${totalItems} madde tamamlandı (%${percentage})`]);
+            merges.push({ s: { r: summaryRowIdx + 1, c: 0 }, e: { r: summaryRowIdx + 1, c: 4 } });
+            rowStyles[summaryRowIdx + 1] = { style: { font: { bold: true, sz: 12, color: { rgb: percentage === 100 ? "006100" : "9C0006" } } } };
+
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            ws['!cols'] = [{ wch: 20 }, { wch: 62 }, { wch: 48 }, { wch: 12 }, { wch: 20 }];
+            ws['!merges'] = merges;
+            ws['!rows'] = aoa.map((_, i) => ({ hpx: (i === 1 ? 20 : 18) }));
+
+            // Hücre stillerini uygula
+            for (let r = 0; r < aoa.length; r++) {
+                const rowInfo = rowStyles[r];
+                for (let c = 0; c < 5; c++) {
+                    const cellRef = XLSX.utils.encode_cell({ r, c });
+                    if (!ws[cellRef]) continue;
+
+                    if (rowInfo && rowInfo.isHeaderRow) {
+                        ws[cellRef].s = headerStyle;
+                    } else if (rowInfo && rowInfo.isSectionRow) {
+                        ws[cellRef].s = sectionStyle;
+                    } else if (rowInfo && rowInfo.isDataRow) {
+                        ws[cellRef].s = dataCellStyle(rowInfo.isChecked, c === 4);
+                    } else if (rowInfo && rowInfo.style) {
+                        ws[cellRef].s = rowInfo.style;
+                    }
+                }
+            }
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Faz-4 Denetim Raporu");
+
+            const fileName = `${schoolName} Faz-4 Yerel Alan Ağı Denetim.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
